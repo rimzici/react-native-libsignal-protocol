@@ -4,7 +4,6 @@ package com.reactlibrary;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Callback;
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.util.KeyHelper;
 import org.whispersystems.libsignal.state.PreKeyRecord;
@@ -13,6 +12,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Promise;
 
 import android.util.Log;
 import android.util.Base64;
@@ -24,6 +24,7 @@ import java.util.List;
 public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
 
   private final ReactApplicationContext reactContext;
+  private static final String RN_LIBSIGNAL_ERROR = "RN_LIBSIGNAL_ERROR";
 
   public RNLibsignalProtocolModule(ReactApplicationContext reactContext) {
     super(reactContext);
@@ -36,7 +37,7 @@ public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void generateIdentityKeyPair(Callback successCallback, Callback errorCallback) {
+  public void generateIdentityKeyPair(Promise promise) {
     try {
       IdentityKeyPair identityKeyPair = KeyHelper.generateIdentityKeyPair();
       String publicKey = Base64.encodeToString(identityKeyPair.getPublicKey().serialize(), Base64.DEFAULT);
@@ -47,24 +48,24 @@ public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
       keyPairMap.putString("privateKey", privateKey);
       keyPairMap.putString("serializedKP", serializedKP);
 
-      successCallback.invoke(keyPairMap);
+      promise.resolve(keyPairMap);
     } catch (Exception e) {
-      errorCallback.invoke(e.getMessage());
+      promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
     }
   }
 
   @ReactMethod
-  public void generateRegistrationId(Callback successCallback, Callback errorCallback) {
+  public void generateRegistrationId(Promise promise) {
     try {
       int registrationId = KeyHelper.generateRegistrationId(false);
-      successCallback.invoke(registrationId);
+      promise.resolve(registrationId);
     } catch (Exception e) {
-      errorCallback.invoke(e.getMessage());
+      promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
     }
   }
 
   @ReactMethod
-  public void generatePreKeys(int startId, int count, Callback successCallback, Callback errorCallback) {
+  public void generatePreKeys(int startId, int count, Promise promise) {
     try {
       List<PreKeyRecord> preKeys = KeyHelper.generatePreKeys(startId, count);
 
@@ -82,14 +83,14 @@ public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
         preKeyMapsArray.pushMap(preKeyMap);
       }
 
-      successCallback.invoke(preKeyMapsArray);
+      promise.resolve(preKeyMapsArray);
     } catch (Exception e) {
-      errorCallback.invoke(e.getMessage());
+      promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
     }
   }
 
   @ReactMethod
-  public void generateSignedPreKey(ReadableMap identityKeyPair, int signedKeyId, Callback successCallback, Callback errorCallback) {
+  public void generateSignedPreKey(ReadableMap identityKeyPair, int signedKeyId, Promise promise) {
     try {
       byte[] serialized = Base64.decode(identityKeyPair.getString("serializedKP"), Base64.DEFAULT);
 
@@ -108,9 +109,9 @@ public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
       signedPreKeyMap.putInt("signedPreKeyId", signedPreKeyId);
       signedPreKeyMap.putString("seriaizedSignedPreKey", seriaizedSignedPreKey);
 
-      successCallback.invoke(signedPreKeyMap);
+      promise.resolve(signedPreKeyMap);
     } catch (Exception e) {
-      errorCallback.invoke(e.getMessage());
+      promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
     }
   }
 }
