@@ -4,7 +4,10 @@ package com.reactlibrary;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+
+import org.whispersystems.libsignal.IdentityKey;
 import org.whispersystems.libsignal.IdentityKeyPair;
+import org.whispersystems.libsignal.SignalProtocolAddress;
 import org.whispersystems.libsignal.util.KeyHelper;
 import org.whispersystems.libsignal.state.PreKeyRecord;
 import org.whispersystems.libsignal.state.SignedPreKeyRecord;
@@ -14,10 +17,13 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 
+import com.reactlibrary.storage.ProtocolStorage;
+
 import android.util.Log;
 import android.util.Base64;
 
 import java.lang.Exception;
+import java.math.BigInteger;
 import java.util.List;
 
 
@@ -26,9 +32,13 @@ public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
   private final ReactApplicationContext reactContext;
   private static final String RN_LIBSIGNAL_ERROR = "RN_LIBSIGNAL_ERROR";
 
+  ProtocolStorage protocolStorage;
+
   public RNLibsignalProtocolModule(ReactApplicationContext reactContext) {
     super(reactContext);
     this.reactContext = reactContext;
+
+    protocolStorage = new ProtocolStorage(reactContext);
   }
 
   @Override
@@ -48,7 +58,9 @@ public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
       keyPairMap.putString("privateKey", privateKey);
       keyPairMap.putString("serializedKP", serializedKP);
 
+      protocolStorage.setIdentityKeyPair(identityKeyPair);
       promise.resolve(keyPairMap);
+
     } catch (Exception e) {
       promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
     }
@@ -58,6 +70,7 @@ public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
   public void generateRegistrationId(Promise promise) {
     try {
       int registrationId = KeyHelper.generateRegistrationId(false);
+      protocolStorage.setLocalRegistrationId(registrationId);
       promise.resolve(registrationId);
     } catch (Exception e) {
       promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
@@ -114,4 +127,16 @@ public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
       promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
     }
   }
+
+  // public void demoStoreRetrieveIdentityKP() {
+  //   IdentityKey idKey = new IdentityKey(identityKeyPair.getPublicKey().serialize(), 0);
+  //     String[] nameAndDeviceId = address.split("/");
+  //     int deviceId = new BigInteger(nameAndDeviceId[1]).intValue();
+  //     SignalProtocolAddress spAddress = new SignalProtocolAddress(nameAndDeviceId[0], deviceId);
+  //     boolean flag = protocolStorage.saveIdentity(spAddress, idKey);
+
+  //     Log.d("TEST IN", Base64.encodeToString(idKey.serialize(), Base64.DEFAULT));
+  //     IdentityKey out = protocolStorage.getIdentity(spAddress);
+  //     Log.d("TEST OUT", Base64.encodeToString(out.serialize(), Base64.DEFAULT));
+  // }
 }
