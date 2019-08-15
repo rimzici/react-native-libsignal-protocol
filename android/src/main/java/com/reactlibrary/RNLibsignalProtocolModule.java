@@ -213,8 +213,7 @@ public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
     byte[] messageDecrypted = null;
     try {
       messageDecrypted = sessionCipher.decrypt(new PreKeySignalMessage(Base64.decode(message, Base64.DEFAULT)));
-      Log.d("TEST OUT DEC", Base64.encodeToString(messageDecrypted, Base64.DEFAULT));
-      promise.resolve(Base64.encodeToString(messageDecrypted, Base64.DEFAULT));
+      promise.resolve(new String (messageDecrypted));
     } catch (UntrustedIdentityException e) {
       promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
       e.printStackTrace();
