@@ -158,6 +158,7 @@ public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
 
     try {
       int preKeyId = retrievedPreKeyBundle.getInt("preKeyId");
+      int registrationId = retrievedPreKeyBundle.getInt("registrationId");
       ECPublicKey preKey = new PreKeyRecord(Base64.decode(retrievedPreKeyBundle.getString("preKey"), Base64.DEFAULT)).getKeyPair().getPublicKey();
       int signedPreKeyId = retrievedPreKeyBundle.getInt("signedPreKeyId");
       SignedPreKeyRecord signedPreKey = new SignedPreKeyRecord(Base64.decode(retrievedPreKeyBundle.getString("seriaizedSignedPreKey"), Base64.DEFAULT));
@@ -166,7 +167,7 @@ public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
       IdentityKey identityKey = new IdentityKey(Base64.decode(retrievedPreKeyBundle.getString("identityKey"), Base64.DEFAULT), 0);
 
       PreKeyBundle preKeyBundle = new PreKeyBundle(
-              0,
+              registrationId,
               deviceId,
               preKeyId,
               preKey,
