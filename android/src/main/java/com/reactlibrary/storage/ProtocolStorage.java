@@ -2,9 +2,11 @@
 package com.reactlibrary.storage;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.whispersystems.libsignal.state.SignalProtocolStore;
 import org.whispersystems.libsignal.state.IdentityKeyStore;
+import org.whispersystems.libsignal.state.PreKeyStore;
 import org.whispersystems.libsignal.IdentityKey;
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.SignalProtocolAddress;
@@ -12,13 +14,16 @@ import org.whispersystems.libsignal.InvalidKeyIdException;
 import org.whispersystems.libsignal.state.PreKeyRecord;
 import org.whispersystems.libsignal.state.SessionRecord;
 import org.whispersystems.libsignal.state.SignedPreKeyRecord;
+import org.whispersystems.libsignal.state.SignedPreKeyStore;
 
 import java.util.List;
 
-// public class ProtocolStorage implements SignalProtocolStore {
-public class ProtocolStorage implements IdentityKeyStore {
+public class ProtocolStorage implements SignalProtocolStore {
 
     DatabaseManager db;
+    PreferenceManager pref;
+
+    public static String LOGTAG = "PROTOCOL_STORAGE : ";
 
     public static final String PREKEY_TABLENAME = "prekeys";
 	public static final String SIGNED_PREKEY_TABLENAME = "signed_prekeys";
@@ -41,32 +46,30 @@ public class ProtocolStorage implements IdentityKeyStore {
     
     public ProtocolStorage (Context context) {
         db = DatabaseManager.getInstance(context);
+        pref = new PreferenceManager(context);
     }
 
     /**
     * IdentityKeyStore
     */
 
-    public int regId;
-    public IdentityKeyPair identityKP;
     public void setLocalRegistrationId(int id) {
-        // Save in shared preference.
-        regId = id;
+        pref.setLocalRegistrationId(id);
     }
     public void setIdentityKeyPair(IdentityKeyPair iKP) {
-        // Save in shared preference.
-        identityKP = iKP;
+        pref.setIdentityKeyPair(iKP);
     }
+
     @Override
     public IdentityKeyPair getIdentityKeyPair() {
-        // Get from shared preference.
-        return identityKP;
+        return pref.getIdentityKeyPair();
     }
+
     @Override
     public int getLocalRegistrationId() {
-        // Get from shared preference.
-        return regId;
+        return pref.getLocalRegistrationId();
     }
+
     @Override
     public boolean saveIdentity(SignalProtocolAddress address, IdentityKey identityKey) {
         return db.saveIdentity(address, identityKey);
@@ -82,88 +85,95 @@ public class ProtocolStorage implements IdentityKeyStore {
         return db.getIdentity(address);
     }
 
+
     /**
     * PreKeyStore
     */
-//    @Override
-//    public PreKeyRecord loadPreKey(int preKeyId) throws InvalidKeyIdException {
-//
-//    }
-//
-//    @Override
-//    public void storePreKey(int preKeyId, PreKeyRecord record) {
-//
-//    }
-//
-//    @Override
-//    public boolean containsPreKey(int preKeyId) {
-//
-//    }
-//
-//    @Override
-//    public void removePreKey(int preKeyId) {
-//
-//    }
-//
-//    /**
-//    * SessionStore
-//    */
-//    @Override
-//    public SessionRecord loadSession(SignalProtocolAddress address) {
-//
-//    }
-//
-//    @Override
-//    public List<Integer> getSubDeviceSessions(String name) {
-//
-//    }
-//
-//    @Override
-//    public void storeSession(SignalProtocolAddress address, SessionRecord record) {
-//
-//    }
-//
-//    @Override
-//    public boolean containsSession(SignalProtocolAddress address) {
-//
-//    }
-//
-//    @Override
-//    public void deleteSession(SignalProtocolAddress address) {
-//
-//    }
-//
-//    @Override
-//    public void deleteAllSessions(String name) {
-//
-//    }
-//
-//    /**
-//    * SignedPreKeyStore
-//    */
-//    @Override
-//    public SignedPreKeyRecord loadSignedPreKey(int signedPreKeyId) throws InvalidKeyIdException {
-//
-//    }
-//
-//    @Override
-//    public List<SignedPreKeyRecord> loadSignedPreKeys() {
-//
-//    }
-//
-//    @Override
-//    public void storeSignedPreKey(int signedPreKeyId, SignedPreKeyRecord record) {
-//
-//    }
-//
-//    @Override
-//    public boolean containsSignedPreKey(int signedPreKeyId) {
-//
-//    }
-//
-//    @Override
-//    public void removeSignedPreKey(int signedPreKeyId) {
-//
-//    }
+
+    @Override
+    public void storePreKey(int preKeyId, PreKeyRecord record) {
+        db.storePreKey(preKeyId, record);
+    }
+
+    @Override
+    public PreKeyRecord loadPreKey(int preKeyId) throws InvalidKeyIdException {
+        return db.loadPreKey(preKeyId);
+    }
+
+    @Override
+    public boolean containsPreKey(int preKeyId) {
+        return db.containsPreKey(preKeyId);
+    }
+
+    @Override
+    public void removePreKey(int preKeyId) {
+        db.removePreKey(preKeyId);
+    }
+
+
+    /**
+    * SessionStore
+    */
+
+    @Override
+    public SessionRecord loadSession(SignalProtocolAddress address) {
+        return db.loadSession(address);
+    }
+
+    @Override
+    public List<Integer> getSubDeviceSessions(String name) {
+        return db.getSubDeviceSessions(name);
+    }
+
+    @Override
+    public void storeSession(SignalProtocolAddress address, SessionRecord record) {
+        db.storeSession(address, record);
+    }
+
+    @Override
+    public boolean containsSession(SignalProtocolAddress address) {
+        return db.containsSession(address);
+    }
+
+    @Override
+    public void deleteSession(SignalProtocolAddress address) {
+        db.deleteSession(address);
+    }
+
+    @Override
+    public void deleteAllSessions(String name) {
+        db.deleteAllSessions(name);
+    }
+
+
+    /**
+    * SignedPreKeyStore
+    */
+
+
+    @Override
+    public void storeSignedPreKey(int signedPreKeyId, SignedPreKeyRecord record) {
+        db.storeSignedPreKey(signedPreKeyId, record);
+    }
+
+    @Override
+    public SignedPreKeyRecord loadSignedPreKey(int signedPreKeyId) throws InvalidKeyIdException {
+        return db.loadSignedPreKey(signedPreKeyId);
+    }
+
+    @Override
+    public List<SignedPreKeyRecord> loadSignedPreKeys() {
+        return db.loadSignedPreKeys();
+    }
+
+    @Override
+    public boolean containsSignedPreKey(int signedPreKeyId) {
+        return db.containsSignedPreKey(signedPreKeyId);
+    }
+
+    @Override
+    public void removeSignedPreKey(int signedPreKeyId) {
+        db.removeSignedPreKey(signedPreKeyId);
+    }
 
 }
