@@ -12,7 +12,8 @@ Pod::Spec.new do |s|
   s.author             = { "author" => "rimnesh.fernandez@telldus.com" }
   s.platform     = :ios, "9.0"
   s.source       = { :git => "https://github.com/telldus/react-native-libsignal-protocol.git", :tag => "ios" }
-  s.source_files  = "ios/*.{h,m,swift}"
+  s.source_files  = "ios/*"
+  s.preserve_paths = 'ios/*'
   s.requires_arc = true
 
 
