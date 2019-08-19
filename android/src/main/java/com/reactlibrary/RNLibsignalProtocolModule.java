@@ -4,8 +4,26 @@ package com.reactlibrary;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Callback;
+
+import org.whispersystems.libsignal.DuplicateMessageException;
+import org.whispersystems.libsignal.IdentityKey;
 import org.whispersystems.libsignal.IdentityKeyPair;
+import org.whispersystems.libsignal.InvalidKeyException;
+import org.whispersystems.libsignal.InvalidKeyIdException;
+import org.whispersystems.libsignal.InvalidMessageException;
+import org.whispersystems.libsignal.InvalidVersionException;
+import org.whispersystems.libsignal.LegacyMessageException;
+import org.whispersystems.libsignal.NoSessionException;
+import org.whispersystems.libsignal.SessionBuilder;
+import org.whispersystems.libsignal.SessionCipher;
+import org.whispersystems.libsignal.SignalProtocolAddress;
+import org.whispersystems.libsignal.UntrustedIdentityException;
+import org.whispersystems.libsignal.ecc.Curve;
+import org.whispersystems.libsignal.ecc.ECPublicKey;
+import org.whispersystems.libsignal.protocol.CiphertextMessage;
+import org.whispersystems.libsignal.protocol.PreKeySignalMessage;
+import org.whispersystems.libsignal.protocol.SignalMessage;
+import org.whispersystems.libsignal.state.PreKeyBundle;
 import org.whispersystems.libsignal.util.KeyHelper;
 import org.whispersystems.libsignal.state.PreKeyRecord;
 import org.whispersystems.libsignal.state.SignedPreKeyRecord;
@@ -13,21 +31,32 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Promise;
+
+import com.reactlibrary.storage.ProtocolStorage;
 
 import android.util.Log;
 import android.util.Base64;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.Exception;
+import java.math.BigInteger;
 import java.util.List;
 
 
 public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
 
   private final ReactApplicationContext reactContext;
+  private static final String RN_LIBSIGNAL_ERROR = "RN_LIBSIGNAL_ERROR";
+
+  ProtocolStorage protocolStorage;
 
   public RNLibsignalProtocolModule(ReactApplicationContext reactContext) {
     super(reactContext);
     this.reactContext = reactContext;
+
+    protocolStorage = new ProtocolStorage(reactContext);
   }
 
   @Override
@@ -36,7 +65,7 @@ public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void generateIdentityKeyPair(Callback successCallback, Callback errorCallback) {
+  public void generateIdentityKeyPair(Promise promise) {
     try {
       IdentityKeyPair identityKeyPair = KeyHelper.generateIdentityKeyPair();
       String publicKey = Base64.encodeToString(identityKeyPair.getPublicKey().serialize(), Base64.DEFAULT);
@@ -47,24 +76,27 @@ public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
       keyPairMap.putString("privateKey", privateKey);
       keyPairMap.putString("serializedKP", serializedKP);
 
-      successCallback.invoke(keyPairMap);
+      protocolStorage.setIdentityKeyPair(identityKeyPair);
+      promise.resolve(keyPairMap);
+
     } catch (Exception e) {
-      errorCallback.invoke(e.getMessage());
+      promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
     }
   }
 
   @ReactMethod
-  public void generateRegistrationId(Callback successCallback, Callback errorCallback) {
+  public void generateRegistrationId(Promise promise) {
     try {
       int registrationId = KeyHelper.generateRegistrationId(false);
-      successCallback.invoke(registrationId);
+      protocolStorage.setLocalRegistrationId(registrationId);
+      promise.resolve(registrationId);
     } catch (Exception e) {
-      errorCallback.invoke(e.getMessage());
+      promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
     }
   }
 
   @ReactMethod
-  public void generatePreKeys(int startId, int count, Callback successCallback, Callback errorCallback) {
+  public void generatePreKeys(int startId, int count, Promise promise) {
     try {
       List<PreKeyRecord> preKeys = KeyHelper.generatePreKeys(startId, count);
 
@@ -80,16 +112,18 @@ public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
         preKeyMap.putInt("preKeyId", preKeyId);
         preKeyMap.putString("seriaizedPreKey", seriaizedPreKey);
         preKeyMapsArray.pushMap(preKeyMap);
+
+        protocolStorage.storePreKey(preKeyId, key);
       }
 
-      successCallback.invoke(preKeyMapsArray);
+      promise.resolve(preKeyMapsArray);
     } catch (Exception e) {
-      errorCallback.invoke(e.getMessage());
+      promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
     }
   }
 
   @ReactMethod
-  public void generateSignedPreKey(ReadableMap identityKeyPair, int signedKeyId, Callback successCallback, Callback errorCallback) {
+  public void generateSignedPreKey(ReadableMap identityKeyPair, int signedKeyId, Promise promise) {
     try {
       byte[] serialized = Base64.decode(identityKeyPair.getString("serializedKP"), Base64.DEFAULT);
 
@@ -107,10 +141,94 @@ public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
       signedPreKeyMap.putString("signedPreKeySignature", signedPreKeySignature);
       signedPreKeyMap.putInt("signedPreKeyId", signedPreKeyId);
       signedPreKeyMap.putString("seriaizedSignedPreKey", seriaizedSignedPreKey);
+      
+      protocolStorage.storeSignedPreKey(signedPreKeyId, signedPreKey);
 
-      successCallback.invoke(signedPreKeyMap);
+      promise.resolve(signedPreKeyMap);
     } catch (Exception e) {
-      errorCallback.invoke(e.getMessage());
+      promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
+    }
+  }
+
+  @ReactMethod
+  public void buildSession(String recipientId, int deviceId, ReadableMap retrievedPreKeyBundle, Promise promise) {
+    SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(recipientId, deviceId);
+
+    // Instantiate a SessionBuilder for a remote recipientId + deviceId tuple.
+    SessionBuilder sessionBuilder = new SessionBuilder(protocolStorage, signalProtocolAddress);
+
+    try {
+      int preKeyId = retrievedPreKeyBundle.getInt("preKeyId");
+      int registrationId = retrievedPreKeyBundle.getInt("registrationId");
+      ECPublicKey preKey = Curve.decodePoint(Base64.decode(retrievedPreKeyBundle.getString("preKeyPublic"), Base64.DEFAULT), 0);
+      int signedPreKeyId = retrievedPreKeyBundle.getInt("signedPreKeyId");
+      ECPublicKey signedPreKeyPublic = Curve.decodePoint(Base64.decode(retrievedPreKeyBundle.getString("signedPreKeyPublic"), Base64.DEFAULT), 0);
+      byte[] signedPreKeySignature = Base64.decode(retrievedPreKeyBundle.getString("signedPreKeySignature"), Base64.DEFAULT);
+      IdentityKey identityKey = new IdentityKey(Base64.decode(retrievedPreKeyBundle.getString("identityKey"), Base64.DEFAULT), 0);
+
+      PreKeyBundle preKeyBundle = new PreKeyBundle(
+              registrationId,
+              deviceId,
+              preKeyId,
+              preKey,
+              signedPreKeyId,
+              signedPreKeyPublic,
+              signedPreKeySignature,
+              identityKey
+              );
+      // Build a session with a PreKey retrieved from the server.
+      sessionBuilder.process(preKeyBundle);
+      promise.resolve(true);
+    } catch (InvalidKeyException e) {
+      Log.d(ProtocolStorage.LOGTAG, "Encountered InvalidKeyException for the recepient " + recipientId);
+      promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
+    } catch (UntrustedIdentityException e) {
+      Log.d(ProtocolStorage.LOGTAG, "Encountered UntrustedIdentityException for the recepient " + recipientId);
+      promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
+    }
+  }
+
+  @ReactMethod
+  public void encrypt (String message, String recipientId, int deviceId, Promise promise) {
+    SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(recipientId, deviceId);
+    SessionCipher sessionCipher = new SessionCipher(protocolStorage, signalProtocolAddress);
+    CiphertextMessage messageEncryped = null;
+    try {
+      messageEncryped = sessionCipher.encrypt(message.getBytes("UTF-8"));
+      promise.resolve(Base64.encodeToString(messageEncryped.serialize(), Base64.DEFAULT));
+    } catch (UntrustedIdentityException e) {
+      e.printStackTrace();
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @ReactMethod
+  public void decrypt (String message, String recipientId, int deviceId, Promise promise) {
+    SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(recipientId, deviceId);
+    SessionCipher sessionCipher = new SessionCipher(protocolStorage, signalProtocolAddress);
+    byte[] messageDecrypted = null;
+    try {
+      messageDecrypted = sessionCipher.decrypt(new PreKeySignalMessage(Base64.decode(message, Base64.DEFAULT)));
+      promise.resolve(new String (messageDecrypted));
+    } catch (UntrustedIdentityException e) {
+      promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
+      e.printStackTrace();
+    } catch (LegacyMessageException e) {
+      promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
+      e.printStackTrace();
+    } catch (InvalidMessageException e) {
+      promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
+      e.printStackTrace();
+    } catch (DuplicateMessageException e) {
+      promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
+      e.printStackTrace();
+    } catch (InvalidVersionException e) {
+      e.printStackTrace();
+    } catch (InvalidKeyIdException e) {
+      e.printStackTrace();
+    } catch (InvalidKeyException e) {
+      e.printStackTrace();
     }
   }
 }

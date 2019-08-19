@@ -7,8 +7,55 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2603B4AA23080C7600A92C4A /* RNLibsignalProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2603B4A923080C7600A92C4A /* RNLibsignalProtocol.swift */; };
+		269137A723084C8C0082D4BD /* SignalProtocol.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2691379E23084C730082D4BD /* SignalProtocol.framework */; };
 		B3E7B58A1CC2AC0600A0062D /* RNLibsignalProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNLibsignalProtocol.m */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		2691379D23084C730082D4BD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2691379423084C730082D4BD /* libsignal-protocol-swift.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CE1F0C35203467B3003F1C04;
+			remoteInfo = "libsignal-protocol-swift iOS";
+		};
+		2691379F23084C730082D4BD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2691379423084C730082D4BD /* libsignal-protocol-swift.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CE1F0C5420346830003F1C04;
+			remoteInfo = "libsignal-protocol-swift macOS";
+		};
+		269137A123084C730082D4BD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2691379423084C730082D4BD /* libsignal-protocol-swift.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CE1F0C612034685B003F1C04;
+			remoteInfo = "libsignal-protocol-swift tvOS";
+		};
+		269137A323084C730082D4BD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2691379423084C730082D4BD /* libsignal-protocol-swift.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CE1F0C6E20346875003F1C04;
+			remoteInfo = "libsignal-protocol-swift watchOS";
+		};
+		269137A523084C730082D4BD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2691379423084C730082D4BD /* libsignal-protocol-swift.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = CE1F0C3E203467B3003F1C04;
+			remoteInfo = "libsignal-protocol-swiftTests";
+		};
+		269137A823084CA60082D4BD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2691379423084C730082D4BD /* libsignal-protocol-swift.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = CE1F0C34203467B3003F1C04;
+			remoteInfo = "libsignal-protocol-swift iOS";
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		58B511D91A9E6C8500147676 /* CopyFiles */ = {
@@ -24,7 +71,9 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNLibsignalProtocol.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNLibsignalProtocol.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		B3E7B5881CC2AC0600A0062D /* RNLibsignalProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNLibsignalProtocol.h; sourceTree = "<group>"; };
+		2603B4A823080C7500A92C4A /* RNLibsignalProtocol-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNLibsignalProtocol-Bridging-Header.h"; sourceTree = "<group>"; };
+		2603B4A923080C7600A92C4A /* RNLibsignalProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNLibsignalProtocol.swift; sourceTree = "<group>"; };
+		2691379423084C730082D4BD /* libsignal-protocol-swift.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "libsignal-protocol-swift.xcodeproj"; path = "libsignal-protocol-swift-master/libsignal-protocol-swift.xcodeproj"; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* RNLibsignalProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNLibsignalProtocol.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -33,6 +82,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				269137A723084C8C0082D4BD /* SignalProtocol.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -47,12 +97,34 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		26913790230846940082D4BD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		2691379523084C730082D4BD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2691379E23084C730082D4BD /* SignalProtocol.framework */,
+				269137A023084C730082D4BD /* SignalProtocol.framework */,
+				269137A223084C730082D4BD /* SignalProtocol.framework */,
+				269137A423084C730082D4BD /* SignalProtocol.framework */,
+				269137A623084C730082D4BD /* libsignal-protocol-swiftTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				B3E7B5881CC2AC0600A0062D /* RNLibsignalProtocol.h */,
+				2691379423084C730082D4BD /* libsignal-protocol-swift.xcodeproj */,
+				2603B4A923080C7600A92C4A /* RNLibsignalProtocol.swift */,
 				B3E7B5891CC2AC0600A0062D /* RNLibsignalProtocol.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
+				2603B4A823080C7500A92C4A /* RNLibsignalProtocol-Bridging-Header.h */,
+				26913790230846940082D4BD /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -70,6 +142,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				269137A923084CA60082D4BD /* PBXTargetDependency */,
 			);
 			name = RNLibsignalProtocol;
 			productName = RCTDataManager;
@@ -87,6 +160,7 @@
 				TargetAttributes = {
 					58B511DA1A9E6C8500147676 = {
 						CreatedOnToolsVersion = 6.1.1;
+						LastSwiftMigration = 1020;
 					};
 				};
 			};
@@ -95,11 +169,18 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 58B511D21A9E6C8500147676;
 			productRefGroup = 58B511D21A9E6C8500147676;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 2691379523084C730082D4BD /* Products */;
+					ProjectRef = 2691379423084C730082D4BD /* libsignal-protocol-swift.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				58B511DA1A9E6C8500147676 /* RNLibsignalProtocol */,
@@ -107,16 +188,63 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXReferenceProxy section */
+		2691379E23084C730082D4BD /* SignalProtocol.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = SignalProtocol.framework;
+			remoteRef = 2691379D23084C730082D4BD /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		269137A023084C730082D4BD /* SignalProtocol.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = SignalProtocol.framework;
+			remoteRef = 2691379F23084C730082D4BD /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		269137A223084C730082D4BD /* SignalProtocol.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = SignalProtocol.framework;
+			remoteRef = 269137A123084C730082D4BD /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		269137A423084C730082D4BD /* SignalProtocol.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = SignalProtocol.framework;
+			remoteRef = 269137A323084C730082D4BD /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		269137A623084C730082D4BD /* libsignal-protocol-swiftTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "libsignal-protocol-swiftTests.xctest";
+			remoteRef = 269137A523084C730082D4BD /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
 /* Begin PBXSourcesBuildPhase section */
 		58B511D71A9E6C8500147676 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				B3E7B58A1CC2AC0600A0062D /* RNLibsignalProtocol.m in Sources */,
+				2603B4AA23080C7600A92C4A /* RNLibsignalProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		269137A923084CA60082D4BD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "libsignal-protocol-swift iOS";
+			targetProxy = 269137A823084CA60082D4BD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		58B511ED1A9E6C8500147676 /* Debug */ = {
@@ -156,7 +284,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -193,7 +321,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -203,32 +331,39 @@
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				HEADER_SEARCH_PATHS = (
-				"$(inherited)",
+					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SRCROOT)/../../../React/**",
-					"$(SRCROOT)/../../react-native/React/**",
 				);
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RNLibsignalProtocol;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNLibsignalProtocol-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SRCROOT)/../../../React/**",
-					"$(SRCROOT)/../../react-native/React/**",
 				);
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RNLibsignalProtocol;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNLibsignalProtocol-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
