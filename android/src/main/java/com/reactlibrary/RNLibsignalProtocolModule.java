@@ -18,6 +18,7 @@ import org.whispersystems.libsignal.SessionBuilder;
 import org.whispersystems.libsignal.SessionCipher;
 import org.whispersystems.libsignal.SignalProtocolAddress;
 import org.whispersystems.libsignal.UntrustedIdentityException;
+import org.whispersystems.libsignal.ecc.Curve;
 import org.whispersystems.libsignal.ecc.ECPublicKey;
 import org.whispersystems.libsignal.protocol.CiphertextMessage;
 import org.whispersystems.libsignal.protocol.PreKeySignalMessage;
@@ -159,11 +160,10 @@ public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
     try {
       int preKeyId = retrievedPreKeyBundle.getInt("preKeyId");
       int registrationId = retrievedPreKeyBundle.getInt("registrationId");
-      ECPublicKey preKey = new PreKeyRecord(Base64.decode(retrievedPreKeyBundle.getString("preKey"), Base64.DEFAULT)).getKeyPair().getPublicKey();
+      ECPublicKey preKey = Curve.decodePoint(Base64.decode(retrievedPreKeyBundle.getString("preKeyPublic"), Base64.DEFAULT), 0);
       int signedPreKeyId = retrievedPreKeyBundle.getInt("signedPreKeyId");
-      SignedPreKeyRecord signedPreKey = new SignedPreKeyRecord(Base64.decode(retrievedPreKeyBundle.getString("seriaizedSignedPreKey"), Base64.DEFAULT));
-      ECPublicKey signedPreKeyPublic = signedPreKey.getKeyPair().getPublicKey();
-      byte[] signedPreKeySignature = signedPreKey.getSignature();
+      ECPublicKey signedPreKeyPublic = Curve.decodePoint(Base64.decode(retrievedPreKeyBundle.getString("signedPreKeyPublic"), Base64.DEFAULT), 0);
+      byte[] signedPreKeySignature = Base64.decode(retrievedPreKeyBundle.getString("signedPreKeySignature"), Base64.DEFAULT);
       IdentityKey identityKey = new IdentityKey(Base64.decode(retrievedPreKeyBundle.getString("identityKey"), Base64.DEFAULT), 0);
 
       PreKeyBundle preKeyBundle = new PreKeyBundle(
@@ -179,9 +179,6 @@ public class RNLibsignalProtocolModule extends ReactContextBaseJavaModule {
       // Build a session with a PreKey retrieved from the server.
       sessionBuilder.process(preKeyBundle);
       promise.resolve(true);
-    } catch (IOException e) {
-      Log.d(ProtocolStorage.LOGTAG, "Encountered IOException for the recepient " + recipientId);
-      promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
     } catch (InvalidKeyException e) {
       Log.d(ProtocolStorage.LOGTAG, "Encountered InvalidKeyException for the recepient " + recipientId);
       promise.reject(RN_LIBSIGNAL_ERROR, e.getMessage());
