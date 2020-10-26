@@ -3,7 +3,9 @@
 
 ## Getting started
 
-`$ npm install react-native-libsignal-protocol --save`
+`$ npm install react-native-libsignal-protocol --save`  
+or  
+`$ yarn add react-native-libsignal-protocol`
 
 ### Mostly automatic installation
 
